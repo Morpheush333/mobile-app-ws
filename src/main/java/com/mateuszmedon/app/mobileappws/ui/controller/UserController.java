@@ -1,5 +1,6 @@
 package com.mateuszmedon.app.mobileappws.ui.controller;
 
+import com.mateuszmedon.app.mobileappws.ui.model.request.UserDetailsRequestModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,7 +13,7 @@ public class UserController {
     }
 
     @PostMapping
-    public String createUser(){
+    public String createUser(@RequestBody UserDetailsRequestModel userDetails){
         return "User was created";
     }
 
