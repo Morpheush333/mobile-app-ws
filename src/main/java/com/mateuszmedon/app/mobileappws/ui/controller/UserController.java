@@ -1,6 +1,5 @@
 package com.mateuszmedon.app.mobileappws.ui.controller;
 
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.mateuszmedon.app.mobileappws.service.UserService;
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
 import com.mateuszmedon.app.mobileappws.ui.model.request.UserDetailsRequestModel;
