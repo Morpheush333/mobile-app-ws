@@ -1,17 +1,19 @@
 package com.mateuszmedon.app.mobileappws.service.impl;
 
-import com.mateuszmedon.app.mobileappws.UserRepository;
+import com.mateuszmedon.app.mobileappws.io.repositories.UserRepository;
 import com.mateuszmedon.app.mobileappws.io.entity.UserEntity;
 import com.mateuszmedon.app.mobileappws.service.UserService;
 import com.mateuszmedon.app.mobileappws.shared.Utils;
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -25,10 +27,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
+
     @Override
     public UserDto createUser(UserDto user) {
 
-        if(userRepository.findByEmail(user.getEmail()) != null) throw new RuntimeException("Record (Email) already exists.");
+        if (userRepository.findByEmail(user.getEmail()) != null)
+            throw new RuntimeException("Record (Email) already exists.");
 
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(user, userEntity);
@@ -41,14 +45,39 @@ public class UserServiceImpl implements UserService {
         UserEntity storedUserEntity = userRepository.save(userEntity);
 
         UserDto returnValue = new UserDto();
-        BeanUtils.copyProperties(storedUserEntity,returnValue);
+        BeanUtils.copyProperties(storedUserEntity, returnValue);
 
         return returnValue;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-//        TODO: upgrade
-        return null;
+    public UserDto getUser(String email) {
+
+        UserEntity userEntity = userRepository.findByEmail(email);
+        if (userEntity == null) throw new UsernameNotFoundException(email);
+        UserDto returnValue = new UserDto();
+        BeanUtils.copyProperties(userEntity, returnValue);
+
+        return returnValue;
+    }
+
+    @Override
+    public UserDto getUserByUserId(String userId) {
+        UserDto returnValue = new UserDto();
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if (userEntity == null) throw new UsernameNotFoundException(userId);
+
+        BeanUtils.copyProperties(userEntity, returnValue);
+        return returnValue;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        if (userEntity == null) throw new UsernameNotFoundException(email);
+
+        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
     }
 }
