@@ -1,8 +1,11 @@
 package com.mateuszmedon.app.mobileappws.ui.controller;
 
+import com.mateuszmedon.app.mobileappws.exceptions.UserServiceException;
 import com.mateuszmedon.app.mobileappws.service.UserService;
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
 import com.mateuszmedon.app.mobileappws.ui.model.request.UserDetailsRequestModel;
+import com.mateuszmedon.app.mobileappws.ui.model.response.ErrorMessage;
+import com.mateuszmedon.app.mobileappws.ui.model.response.ErrorMessages;
 import com.mateuszmedon.app.mobileappws.ui.model.response.UserRest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,8 @@ public class UserController {
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails){
 
         UserRest returnValue = new UserRest();
+
+        if(userDetails.getFirstName().isEmpty()) throw new NullPointerException("Hej joe");
 
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(userDetails, userDto);
