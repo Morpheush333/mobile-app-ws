@@ -1,4 +1,4 @@
-package com.mateuszmedon.app.mobileappws;
+package com.mateuszmedon.app.mobileappws.io.repositories;
 
 import com.mateuszmedon.app.mobileappws.io.entity.UserEntity;
 import org.springframework.data.repository.CrudRepository;
