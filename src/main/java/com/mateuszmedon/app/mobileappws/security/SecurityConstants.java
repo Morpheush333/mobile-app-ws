@@ -1,16 +1,17 @@
 package com.mateuszmedon.app.mobileappws.security;
 
+import com.mateuszmedon.app.mobileappws.SpringApplicationContext;
+
 public class SecurityConstants {
 
     public static final long EXPIRATION_TIME = 864000000; // 10 days
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
     public static final String SIGN_UP_URL = "/users";
-    public static final String TOKEN_SECRET = "jf1hi3sd3as0izx8c";
 
-//    public static String getTokenSecret()
-//    {
-//        AppProperties appProperties = (AppProperties) SpringApplicationContext.getBean("AppProperties");
-//        return appProperties.getTokenSecret();
-//    }
+    public static String getTokenSecret()
+    {
+        AppProperties appProperties = (AppProperties) SpringApplicationContext.getBean("AppProperties");
+        return appProperties.getTokenSecret();
+    }
 }
