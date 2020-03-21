@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("users")
 public class UserController {
@@ -50,8 +53,8 @@ public class UserController {
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
-
+    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails)
+    {
         UserRest returnValue = new UserRest();
 
         UserDto userDto = new UserDto();
@@ -75,6 +78,24 @@ public class UserController {
 
         returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
+        return returnValue;
+    }
+
+    @GetMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+                                   @RequestParam(value = "limit", defaultValue = "25") int limit)
+    {
+        List<UserRest> returnValue = new ArrayList<>();
+
+        if(page>0) page -= 1;
+
+        List<UserDto> users = userService.getUsers(page, limit);
+
+        for(UserDto userDto : users){
+            UserRest userModel = new UserRest();
+            BeanUtils.copyProperties(userDto, userModel);
+            returnValue.add(userModel);
+        }
         return returnValue;
     }
 
