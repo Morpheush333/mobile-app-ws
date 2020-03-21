@@ -4,10 +4,7 @@ import com.mateuszmedon.app.mobileappws.exceptions.UserServiceException;
 import com.mateuszmedon.app.mobileappws.service.UserService;
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
 import com.mateuszmedon.app.mobileappws.ui.model.request.UserDetailsRequestModel;
-import com.mateuszmedon.app.mobileappws.ui.model.response.ErrorMessage;
-import com.mateuszmedon.app.mobileappws.ui.model.response.ErrorMessages;
-import com.mateuszmedon.app.mobileappws.ui.model.response.OperationStatusModel;
-import com.mateuszmedon.app.mobileappws.ui.model.response.UserRest;
+import com.mateuszmedon.app.mobileappws.ui.model.response.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -67,14 +64,18 @@ public class UserController {
     }
 
     @DeleteMapping(path = "/{id}",
-            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
     public OperationStatusModel deleteUser(@PathVariable String id) {
 
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
 
+        userService.deleteUser(id);
 
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
 
-        return null;
+        return returnValue;
     }
 
 
