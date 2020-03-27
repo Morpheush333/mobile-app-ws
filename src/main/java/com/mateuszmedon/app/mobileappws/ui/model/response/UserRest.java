@@ -1,11 +1,22 @@
 package com.mateuszmedon.app.mobileappws.ui.model.response;
 
+import java.util.List;
+
 public class UserRest {
 
     private String userId;
     private String firstName;
     private String lastName;
     private String email;
+    private List<AddressesRest> addresses;
+
+    public List<AddressesRest> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<AddressesRest> addresses) {
+        this.addresses = addresses;
+    }
 
     public String getUserId() {
         return userId;
