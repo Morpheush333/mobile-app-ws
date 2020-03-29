@@ -72,11 +72,11 @@ public class UserController {
     {
         UserRest returnValue = new UserRest();
 
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(userDetails, userDto);
+        ModelMapper modelMapper = new ModelMapper();
+        UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 
         UserDto updateUser = userService.updateUser(id, userDto);
-        BeanUtils.copyProperties(updateUser, returnValue);
+        returnValue = modelMapper.map(updateUser, UserRest.class);
 
         return returnValue;
     }
@@ -102,6 +102,7 @@ public class UserController {
     {
         List<UserRest> returnValue = new ArrayList<>();
 
+//        TODO: refactor by modelMapper
         if(page>0) page -= 1;
 
         List<UserDto> users = userService.getUsers(page, limit);
