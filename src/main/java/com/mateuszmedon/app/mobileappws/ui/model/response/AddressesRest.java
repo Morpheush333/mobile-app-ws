@@ -1,8 +1,9 @@
 package com.mateuszmedon.app.mobileappws.ui.model.response;
 
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
+import org.springframework.hateoas.RepresentationModel;
 
-public class AddressesRest {
+public class AddressesRest extends RepresentationModel {
 
     private String addressId;
     private String city;

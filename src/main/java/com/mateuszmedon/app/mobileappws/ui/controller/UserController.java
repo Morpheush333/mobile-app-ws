@@ -11,6 +11,10 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +22,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -68,8 +75,7 @@ public class UserController {
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails)
-    {
+    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
         UserRest returnValue = new UserRest();
 
         ModelMapper modelMapper = new ModelMapper();
@@ -98,16 +104,15 @@ public class UserController {
 
     @GetMapping(produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public List<UserRest> getUsers(@RequestParam(value = "page", defaultValue = "0") int page,
-                                   @RequestParam(value = "limit", defaultValue = "25") int limit)
-    {
+                                   @RequestParam(value = "limit", defaultValue = "25") int limit) {
         List<UserRest> returnValue = new ArrayList<>();
 
 //        TODO: refactor by modelMapper
-        if(page>0) page -= 1;
+        if (page > 0) page -= 1;
 
         List<UserDto> users = userService.getUsers(page, limit);
 
-        for(UserDto userDto : users){
+        for (UserDto userDto : users) {
             UserRest userModel = new UserRest();
             BeanUtils.copyProperties(userDto, userModel);
             returnValue.add(userModel);
@@ -116,32 +121,53 @@ public class UserController {
     }
 
 
-//    http://localhost:8080/mobile-app-ws/users/fgfdgdf/addresses
+    //    http://localhost:8080/mobile-app-ws/users/fgfdgdf/addresses
     @GetMapping(path = "/{id}/addresses",
-            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public List<AddressesRest> getUserAddresses(@PathVariable String id) {
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
+    public CollectionModel<AddressesRest> getUserAddresses(@PathVariable String id) {
 
-        List<AddressesRest> returnValue = new ArrayList<>();
+        List<AddressesRest> addressesListRestModel = new ArrayList<>();
 
         List<AddressDto> addressDto = addressService.getAddresses(id);
 
-        if(addressDto != null && !addressDto.isEmpty()) {
-            Type listType = new TypeToken<List<AddressesRest>>() {}.getType();
-            returnValue = new ModelMapper().map(addressDto, listType);
+        if (addressDto != null && !addressDto.isEmpty()) {
+            Type listType = new TypeToken<List<AddressesRest>>() {
+            }.getType();
+            addressesListRestModel = new ModelMapper().map(addressDto, listType);
+
+            for (AddressesRest addressRest : addressesListRestModel) {
+                Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(id, addressRest.getAddressId()))
+                        .withSelfRel();
+                addressRest.add(addressLink);
+
+                Link userLink = linkTo(methodOn(UserController.class).getUser(id)).withRel("user");
+                addressRest.add(userLink);
+            }
         }
 
-        return returnValue;
+        return new CollectionModel<>(addressesListRestModel);
     }
 
     @GetMapping(path = "/{userId}/addresses/{addressId}",
-            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public AddressesRest getUserAddress(@PathVariable String addressId) {
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE, "application/hal+json"})
+    public EntityModel getUserAddress(@PathVariable String addressId,
+                                      @PathVariable String userId) {
 
         AddressDto addressDto = addressService.getAddress(addressId);
 
         ModelMapper modelMapper = new ModelMapper();
+        Link addressLink = linkTo(methodOn(UserController.class).getUserAddress(addressId, userId)).withSelfRel();
+        Link userLink = linkTo(UserController.class).slash(userId).withRel("user");
+        Link addressesLink = linkTo(methodOn(UserController.class).getUserAddresses(userId)).withRel("addresses");
 
-        return modelMapper.map(addressDto, AddressesRest.class);
+
+        AddressesRest addressesRestModel = modelMapper.map(addressDto, AddressesRest.class);
+
+        addressesRestModel.add(addressLink);
+        addressesRestModel.add(userLink);
+        addressesRestModel.add(addressesLink);
+
+        return new EntityModel(addressesRestModel);
     }
 
 
