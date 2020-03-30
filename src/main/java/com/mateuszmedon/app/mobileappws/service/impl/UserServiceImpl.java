@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             boolean hastokenExpired = Utils.hasTokenExpired(token);
             if (!hastokenExpired) {
                 userEntity.setEmailVerificationToken(null);
-                userEntity.setEmailVerificationStatus(Boolean.TRUE);
+                userEntity.setGetEmailVerificationStatus(Boolean.TRUE);
                 userRepository.save(userEntity);
                 returnValue = true;
             }
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setUserId(publicUserId);
         userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userEntity.setEmailVerificationToken(utils.generateVerificationToken(publicUserId));
-        userEntity.setEmailVerificationStatus(false);
+        userEntity.setGetEmailVerificationStatus(false);
 
         UserEntity storedUserEntity = userRepository.save(userEntity);
 
@@ -160,6 +160,11 @@ public class UserServiceImpl implements UserService {
 
         if (userEntity == null) throw new UsernameNotFoundException(email);
 
-        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(),
+                userEntity.getGetEmailVerificationStatus(),
+                true, true,
+                true, new ArrayList<>());
+
+//        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
     }
 }

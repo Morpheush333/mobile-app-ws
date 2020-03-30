@@ -32,7 +32,7 @@ public class UserEntity implements Serializable {
     private String emailVerificationToken;
 
     @Column(nullable = false)
-    private Boolean emailVerificationStatus = false;
+    private Boolean getEmailVerificationStatus = false;
 
     @OneToMany(mappedBy = "userDetails", cascade = CascadeType.ALL)
     private List<AddressEntity> addresses;
@@ -101,11 +101,11 @@ public class UserEntity implements Serializable {
         this.emailVerificationToken = emailVerificationToken;
     }
 
-    public Boolean getEmailVerificationStatus() {
-        return emailVerificationStatus;
+    public Boolean getGetEmailVerificationStatus() {
+        return getEmailVerificationStatus;
     }
 
-    public void setEmailVerificationStatus(Boolean getEmailVerificationStatus) {
-        this.emailVerificationStatus = getEmailVerificationStatus;
+    public void setGetEmailVerificationStatus(Boolean getEmailVerificationStatus) {
+        this.getEmailVerificationStatus = getEmailVerificationStatus;
     }
 }
