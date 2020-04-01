@@ -97,10 +97,10 @@ public class UserServiceImpl implements UserService {
         userEntity.setEmailVerificationToken(utils.generateVerificationToken(publicUserId));
         userEntity.setGetEmailVerificationStatus(false);
 
-        UserEntity storedUserEntity = userRepository.save(userEntity);
+        UserEntity storedUserDetails = userRepository.save(userEntity);
 
-//        BeanUtils.copyProperties(storedUserEntity, returnValue);
-        UserDto returnValue = modelMapper.map(storedUserEntity, UserDto.class);
+//        BeanUtils.copyProperties(storedUserDetails, returnValue);
+        UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
 
         return returnValue;
     }
