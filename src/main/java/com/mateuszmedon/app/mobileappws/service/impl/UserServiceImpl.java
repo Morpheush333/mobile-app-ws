@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
 //        BeanUtils.copyProperties(storedUserDetails, returnValue);
         UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
 
+//        TODO
         new AmazonSES().verifyEmail(returnValue);
 
         return returnValue;
