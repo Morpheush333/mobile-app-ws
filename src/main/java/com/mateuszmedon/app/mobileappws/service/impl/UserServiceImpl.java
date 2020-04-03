@@ -4,6 +4,7 @@ import com.mateuszmedon.app.mobileappws.exceptions.UserServiceException;
 import com.mateuszmedon.app.mobileappws.io.repositories.UserRepository;
 import com.mateuszmedon.app.mobileappws.io.entity.UserEntity;
 import com.mateuszmedon.app.mobileappws.service.UserService;
+import com.mateuszmedon.app.mobileappws.shared.AmazonSES;
 import com.mateuszmedon.app.mobileappws.shared.Utils;
 import com.mateuszmedon.app.mobileappws.shared.dto.AddressDto;
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
@@ -54,26 +55,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean verifyEmailToken(String token) {
-        boolean returnValue = false;
-
-        // Find user by token
-        UserEntity userEntity = userRepository.findUserByEmailVerificationToken(token);
-
-        if (userEntity != null) {
-            boolean hastokenExpired = Utils.hasTokenExpired(token);
-            if (!hastokenExpired) {
-                userEntity.setEmailVerificationToken(null);
-                userEntity.setGetEmailVerificationStatus(Boolean.TRUE);
-                userRepository.save(userEntity);
-                returnValue = true;
-            }
-        }
-
-        return returnValue;
-    }
-
-    @Override
     public UserDto createUser(UserDto user) {
 
         if (userRepository.findByEmail(user.getEmail()) != null)
@@ -97,10 +78,13 @@ public class UserServiceImpl implements UserService {
         userEntity.setEmailVerificationToken(utils.generateVerificationToken(publicUserId));
         userEntity.setGetEmailVerificationStatus(false);
 
-        UserEntity storedUserEntity = userRepository.save(userEntity);
+        UserEntity storedUserDetails = userRepository.save(userEntity);
 
-//        BeanUtils.copyProperties(storedUserEntity, returnValue);
-        UserDto returnValue = modelMapper.map(storedUserEntity, UserDto.class);
+//        BeanUtils.copyProperties(storedUserDetails, returnValue);
+        UserDto returnValue = modelMapper.map(storedUserDetails, UserDto.class);
+
+//        TODO
+        new AmazonSES().verifyEmail(returnValue);
 
         return returnValue;
     }
@@ -166,5 +150,25 @@ public class UserServiceImpl implements UserService {
                 true, new ArrayList<>());
 
 //        return new User(userEntity.getEmail(), userEntity.getEncryptedPassword(), new ArrayList<>());
+    }
+
+    @Override
+    public boolean verifyEmailToken(String token) {
+        boolean returnValue = false;
+
+        // Find user by token
+        UserEntity userEntity = userRepository.findUserByEmailVerificationToken(token);
+
+        if (userEntity != null) {
+            boolean hastokenExpired = Utils.hasTokenExpired(token);
+            if (!hastokenExpired) {
+                userEntity.setEmailVerificationToken(null);
+                userEntity.setGetEmailVerificationStatus(Boolean.TRUE);
+                userRepository.save(userEntity);
+                returnValue = true;
+            }
+        }
+
+        return returnValue;
     }
 }
