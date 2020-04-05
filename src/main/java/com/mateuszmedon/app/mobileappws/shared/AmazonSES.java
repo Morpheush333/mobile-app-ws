@@ -75,4 +75,41 @@ public class AmazonSES {
 
     }
 
+    public boolean sendPasswordResetRequest(String firstName, String email, String token)
+    {
+        boolean returnValue = false;
+
+        AmazonSimpleEmailService client =
+                AmazonSimpleEmailServiceClientBuilder.standard()
+                        .withRegion(Regions.EU_WEST_1).build();
+
+        String htmlBodyWithToken = PASSWORD_RESET_HTMLBODY.replace("$tokenValue", token);
+        htmlBodyWithToken = htmlBodyWithToken.replace("$firstName", firstName);
+
+        String textBodyWithToken = PASSWORD_RESET_TEXTBODY.replace("$tokenValue", token);
+        textBodyWithToken = textBodyWithToken.replace("$firstName", firstName);
+
+
+        SendEmailRequest request = new SendEmailRequest()
+                .withDestination(
+                        new Destination().withToAddresses( email ) )
+                .withMessage(new Message()
+                        .withBody(new Body()
+                                .withHtml(new Content()
+                                        .withCharset("UTF-8").withData(htmlBodyWithToken))
+                                .withText(new Content()
+                                        .withCharset("UTF-8").withData(textBodyWithToken)))
+                        .withSubject(new Content()
+                                .withCharset("UTF-8").withData(PASSWORD_RESET_SUBJECT)))
+                .withSource(FROM);
+
+        SendEmailResult result = client.sendEmail(request);
+        if(result != null && (result.getMessageId()!=null && !result.getMessageId().isEmpty()))
+        {
+            returnValue = true;
+        }
+
+        return returnValue;
+    }
+
 }

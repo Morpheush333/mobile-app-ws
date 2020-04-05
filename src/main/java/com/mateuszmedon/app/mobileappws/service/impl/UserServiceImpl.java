@@ -1,6 +1,8 @@
 package com.mateuszmedon.app.mobileappws.service.impl;
 
 import com.mateuszmedon.app.mobileappws.exceptions.UserServiceException;
+import com.mateuszmedon.app.mobileappws.io.entity.PasswordResetTokenEntity;
+import com.mateuszmedon.app.mobileappws.io.repositories.PasswordResetTokenRepository;
 import com.mateuszmedon.app.mobileappws.io.repositories.UserRepository;
 import com.mateuszmedon.app.mobileappws.io.entity.UserEntity;
 import com.mateuszmedon.app.mobileappws.service.UserService;
@@ -35,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Override
     public List<UserDto> getUsers(int page, int limit) {
@@ -168,6 +173,32 @@ public class UserServiceImpl implements UserService {
                 returnValue = true;
             }
         }
+
+        return returnValue;
+    }
+
+    @Override
+    public boolean requestPasswordReset(String email) {
+
+        boolean returnValue = false;
+
+        UserEntity userEntity = userRepository.findByEmail(email);
+
+        if (userEntity == null) {
+            return returnValue;
+        }
+
+        String token = utils.generatePasswordResetToken(userEntity.getUserId());
+
+        PasswordResetTokenEntity passwordResetTokenEntity = new PasswordResetTokenEntity();
+        passwordResetTokenEntity.setToken(token);
+        passwordResetTokenEntity.setUserDetails(userEntity);
+        passwordResetTokenRepository.save(passwordResetTokenEntity);
+
+        returnValue = new AmazonSES().sendPasswordResetRequest(
+                userEntity.getFirstName(),
+                userEntity.getEmail(),
+                token);
 
         return returnValue;
     }
