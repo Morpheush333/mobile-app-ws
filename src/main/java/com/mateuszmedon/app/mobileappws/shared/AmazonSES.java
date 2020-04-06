@@ -77,6 +77,11 @@ public class AmazonSES {
 
     public boolean sendPasswordResetRequest(String firstName, String email, String token)
     {
+
+        // You can also set your keys this way. And it will work!
+//        System.setProperty("aws.accessKeyId", "");
+//        System.setProperty("aws.secretKey", "");
+
         boolean returnValue = false;
 
         AmazonSimpleEmailService client =
