@@ -35,14 +35,14 @@ class UserControllerTest {
         MockitoAnnotations.initMocks(this);
 
         userDto = new UserDto();
-        userDto.setFirstName("Sergey");
-        userDto.setLastName("Kargopolov");
+        userDto.setFirstName("Mateusz");
+        userDto.setLastName("Medon");
         userDto.setEmail("test@test.com");
         userDto.setGetEmailVerificationStatus(Boolean.FALSE);
         userDto.setEmailVerificationToken(null);
         userDto.setUserId(USER_ID);
         userDto.setAddresses(getAddressesDto());
-        userDto.setEncryptedPassword("xcf58tugh47");
+        userDto.setEncryptedPassword("xcf58tu3fv4sdv42gh47");
     }
 
     @Test
@@ -64,15 +64,15 @@ class UserControllerTest {
     private List<AddressDto> getAddressesDto() {
         AddressDto addressDto = new AddressDto();
         addressDto.setType("shipping");
-        addressDto.setCity("Vancouver");
-        addressDto.setCountry("Canada");
+        addressDto.setCity("Katowice");
+        addressDto.setCountry("Poland");
         addressDto.setPostalCode("ABC123");
         addressDto.setStreetName("123 Street name");
 
         AddressDto billingAddressDto = new AddressDto();
-        billingAddressDto.setType("billling");
-        billingAddressDto.setCity("Vancouver");
-        billingAddressDto.setCountry("Canada");
+        billingAddressDto.setType("billing");
+        billingAddressDto.setCity("Dortmund");
+        billingAddressDto.setCountry("Germany");
         billingAddressDto.setPostalCode("ABC123");
         billingAddressDto.setStreetName("123 Street name");
 

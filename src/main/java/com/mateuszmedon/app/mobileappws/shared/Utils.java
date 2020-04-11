@@ -19,15 +19,22 @@ public class Utils {
     private final String ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     public static boolean hasTokenExpired(String token) {
-        Claims claims = Jwts.parser().setSigningKey(SecurityConstants.getTokenSecret()).parseClaimsJws(token)
-                .getBody();
+        boolean returnValue = false;
 
-        Date tokenExpirationDate = claims.getExpiration();
-        Date todayDate = new Date();
+        try {
+            Claims claims = Jwts.parser().setSigningKey(SecurityConstants.getTokenSecret()).parseClaimsJws(token)
+                    .getBody();
 
-        return tokenExpirationDate.before(todayDate);
+            Date tokenExpirationDate = claims.getExpiration();
+            Date todayDate = new Date();
+
+            returnValue = tokenExpirationDate.before(todayDate);
+        } catch (ExpiredJwtException ex) {
+            returnValue = true;
+        }
+
+        return returnValue;
     }
-
 
     public String generateUserId(int length) {
         return generateRandomString(length);
