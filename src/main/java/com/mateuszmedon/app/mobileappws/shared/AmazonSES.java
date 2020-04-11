@@ -5,7 +5,9 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.*;
 import com.mateuszmedon.app.mobileappws.shared.dto.UserDto;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AmazonSES {
 
     // This address must be verified with Amazon SES.
